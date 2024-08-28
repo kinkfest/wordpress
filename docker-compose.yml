@@ -1,0 +1,39 @@
+services:
+  kf-wp-db:
+    image: mariadb:10.6
+    container_name: kf-wp-db
+    restart: always
+    environment:
+      MYSQL_DATABASE: wordpress
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_USER: kf
+    ports:
+      - 3306:3306
+    volumes:
+      - .sql:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
+
+  kf-wp:
+    image: wordpress:php8.1-apache
+    container_name: kf-wp
+    restart: always
+    depends_on:
+      - kf-wp-db
+    ports:
+      - 80:80
+    environment:
+      WORDPRESS_DB_HOST: 172.17.0.1
+      WORDPRESS_DB_USER: kf
+      WORDPRESS_DB_PASSWORD: password
+      WORDPRESS_DB_NAME: wordpress
+    volumes:
+      - ./cmb2:/var/www/html/wp-content/plugins/cmb2
+      - ./kf-presenters:/var/www/html/wp-content/plugins/kf-presenters
+      - ./kf-workshops:/var/www/html/wp-content/plugins/kf-workshops
+      - ./kf-vendors:/var/www/html/wp-content/plugins/kf-vendors

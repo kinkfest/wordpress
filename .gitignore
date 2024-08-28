@@ -1,0 +1,5 @@
+.env
+*.zip
+
+# ignore this whole folder b/c it's not part of our project
+cmb2/
